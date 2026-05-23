@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PawFound — Adopt. Don't Shop.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800;12..96,900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --orange: #F47C48;
+    --orange-dark: #e06630;
+    --blue: #2F5CC8;
+    --blue-dark: #1e3f9a;
+    --blue-light: #4A73D4;
+    --cream: #FFF8F0;
+    --cream-dark: #F5EBD8;
+    --purple: #9B6FD4;
+    --white: #FFFFFF;
+    --text-dark: #1A1A2E;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: .035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px;
+    animation: grain 0.5s steps(2) infinite;
+  }
+  @keyframes grain {
+    0%,100% { transform: translate(0,0); }
+    25% { transform: translate(-2px,1px); }
+    50% { transform: translate(1px,-2px); }
+    75% { transform: translate(-1px,2px); }
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
+
+  /* ── NAVBAR ── */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.4s, box-shadow 0.4s;
+  }
+  .navbar.solid {
+    background: rgba(255,248,240,0.95);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--blue);
+    text-decoration: none;
+  }
+  .nav-logo svg { width:36px; height:36px; }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--blue); }
+  .btn-nav {
+    background: var(--blue);
+    color: #fff;
+    padding: 0.6rem 1.4rem;
+    border-radius: 50px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    text-decoration: none;
+  }
+  .btn-nav:hover { background: var(--blue-dark); transform: scale(1.04); }
+
+  .hamburger { display:none; background:none; border:none; cursor:pointer; }
+  .mobile-menu {
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: var(--cream);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+  }
+  .mobile-menu.open { display:flex; }
+  .mobile-menu a {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    text-decoration: none;
+    color: var(--blue);
+  }
+  .mobile-close {
+    position: absolute;
+    top: 1.5rem; right: 2rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-dark);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--orange);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 8rem 2rem 4rem;
+  }
+
+  .hero-paw {
+    position: absolute;
+    opacity: 0.12;
+    animation: floatPaw 6s ease-in-out infinite;
+  }
+  .hero-paw:nth-child(1) { top:10%; left:5%; font-size:6rem; animation-delay:0s; }
+  .hero-paw:nth-child(2) { top:15%; right:8%; font-size:4rem; animation-delay:1.5s; }
+  .hero-paw:nth-child(3) { bottom:20%; left:12%; font-size:3rem; animation-delay:3s; }
+  .hero-paw:nth-child(4) { bottom:10%; right:5%; font-size:7rem; animation-delay:0.8s; }
+
+  @keyframes floatPaw {
+    0%,100% { transform: translateY(0) rotate(-10deg); }
+    50% { transform: translateY(-20px) rotate(10deg); }
+  }
+
+  .hero-content {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: var(--blue);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-headline {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(3.5rem, 10vw, 9rem);
+    font-weight: 900;
+    line-height: 0.92;
+    color: var(--blue);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.02em;
+  }
+  .hero-headline span { color: var(--cream); }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: rgba(47,92,200,0.8);
+    margin: 1.5rem 0 2.5rem;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .hero-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    padding: 1rem 2.2rem;
+    border-radius: 50px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { transform: scale(1.05); box-shadow: 0 8px 24px rgba(47,92,200,0.35); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--blue);
+    padding: 1rem 2.2rem;
+    border-radius: 50px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    border: 2.5px solid var(--blue);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-secondary:hover { background: var(--blue); color: #fff; transform: scale(1.05); }
+
+  /* Hero Illustration */
+  .hero-illustration {
+    position: relative;
+    z-index: 2;
+    margin-top: 2.5rem;
+    animation: floatIll 5s ease-in-out infinite;
+  }
+  @keyframes floatIll {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* ── SCROLL FADE ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 6rem 2rem; }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .section-tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+  }
+  .section-title span { color: var(--blue); }
+
+  /* ── HOW IT WORKS ── */
+  .how { background: var(--blue); }
+  .how .section-tag { color: var(--orange); }
+  .how .section-title { color: var(--white); }
+  .how .section-title span { color: var(--orange); }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 3.5rem;
+  }
+  .step-card {
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    position: relative;
+    transition: transform 0.3s, background 0.3s;
+  }
+  .step-card:hover { transform: translateY(-6px); background: rgba(255,255,255,0.14); }
+  .step-num {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.08);
+    position: absolute;
+    top: 1rem; right: 1.5rem;
+    line-height: 1;
+  }
+  .step-icon {
+    width: 64px; height: 64px;
+    background: var(--orange);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+  }
+  .step-card h3 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 0.7rem;
+  }
+  .step-card p { color: rgba(255,255,255,0.65); font-size: 0.95rem; line-height: 1.6; }
+
+  /* ── PETS ── */
+  .pets { background: var(--cream); }
+
+  .filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 0.55rem 1.4rem;
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+    background: transparent;
+    color: var(--blue);
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--blue);
+    color: #fff;
+  }
+
+  .pets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  .pet-card {
+    background: var(--white);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border: 1.5px solid rgba(0,0,0,0.05);
+  }
+  .pet-card:hover {
+    transform: translateY(-6px) rotate(-0.5deg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  .pet-img {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    position: relative;
+  }
+  .pet-info { padding: 1.2rem 1.4rem 1.4rem; }
+  .pet-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+  }
+  .pet-age { font-size: 0.8rem; color: #888; margin-top: 0.15rem; margin-bottom: 0.8rem; }
+  .pet-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .pet-tag {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.25rem 0.7rem;
+    border-radius: 50px;
+    background: var(--cream-dark);
+    color: var(--text-dark);
+  }
+  .btn-adopt {
+    width: 100%;
+    background: var(--orange);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 0.7rem;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn-adopt:hover { background: var(--orange-dark); transform: scale(1.02); }
+
+  .pet-card.hidden { display: none; }
+
+  /* ── WHY ADOPT ── */
+  .why { background: var(--orange); overflow: hidden; position: relative; }
+  .why-bg-text {
+    position: absolute;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(5rem, 18vw, 16rem);
+    font-weight: 900;
+    color: rgba(255,255,255,0.07);
+    white-space: nowrap;
+    top: 50%;
+    left: -2%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    letter-spacing: -0.02em;
+    user-select: none;
+  }
+  .why .section-tag { color: var(--blue); }
+  .why .section-title { color: var(--white); }
+  .why .section-title span { color: var(--blue); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+    position: relative;
+    z-index:2;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.12);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 24px;
+    padding: 2.5rem 2rem;
+    transition: transform 0.3s;
+  }
+  .stat-card:hover { transform: translateY(-4px); }
+  .stat-num {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    color: var(--blue);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.8);
+    margin-top: 0.5rem;
+  }
+
+  /* ── SERVICES ── */
+  .services { background: var(--cream-dark); }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .service-card {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 2rem 1.5rem;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1.5px solid rgba(0,0,0,0.05);
+  }
+  .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.08);
+  }
+  .service-icon {
+    width: 56px; height: 56px;
+    background: var(--blue);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+    color: white;
+  }
+  .service-card h3 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+  }
+  .service-card p { font-size: 0.85rem; color: #777; line-height: 1.5; }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials { background: var(--blue); }
+  .testimonials .section-tag { color: var(--orange); }
+  .testimonials .section-title { color: var(--white); }
+  .testi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .testi-card {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 2rem;
+    transition: transform 0.3s;
+    position: relative;
+  }
+  .testi-card:hover { transform: translateY(-4px); }
+  .testi-quote {
+    font-size: 3rem;
+    color: var(--orange);
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .testi-text { color: rgba(255,255,255,0.85); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; }
+  .testi-author { display: flex; align-items: center; gap: 0.8rem; }
+  .testi-avatar { font-size: 2rem; }
+  .testi-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; color: var(--white); font-size: 0.95rem; }
+  .testi-pet { font-size: 0.75rem; color: var(--orange); }
+
+  /* ── CONTACT ── */
+  .contact { background: var(--cream); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .contact-left { text-align: center; }
+  .contact-left .big-emoji { font-size: 8rem; animation: floatIll 4s ease-in-out infinite; display: block; }
+  .contact-left h3 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--blue);
+    margin-top: 1rem;
+  }
+  .contact-left p { color: #777; margin-top: 0.5rem; }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-input {
+    padding: 1rem 1.2rem;
+    border: 2px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    background: var(--white);
+    transition: border-color 0.2s;
+    outline: none;
+    width: 100%;
+    color: var(--text-dark);
+  }
+  .form-input:focus { border-color: var(--blue); }
+  .form-textarea { resize: vertical; min-height: 120px; }
+  .btn-submit {
+    background: var(--orange);
+    color: #fff;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    align-self: flex-start;
+  }
+  .btn-submit:hover { background: var(--orange-dark); transform: scale(1.04); }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--text-dark);
+    padding: 4rem 2rem 2rem;
+    color: rgba(255,255,255,0.7);
+  }
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  .footer-brand h2 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--white);
+  }
+  .footer-brand p { margin-top: 0.5rem; font-size: 0.9rem; max-width: 260px; }
+  .footer-tagline {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 0.85rem;
+    color: var(--orange);
+    font-weight: 700;
+    margin-top: 1rem;
+    letter-spacing: 0.05em;
+  }
+  .footer-links h4 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .footer-links a { font-size: 0.9rem; color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--orange); }
+  .social-links { display: flex; gap: 0.8rem; margin-top: 1rem; }
+  .social-btn {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .social-btn:hover { background: var(--orange); transform: scale(1.1); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.8rem;
+  }
+  .footer-motto {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--orange);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links, .btn-nav { display: none; }
+    .hamburger { display: block; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-top { flex-direction: column; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-headline { font-size: clamp(2.8rem,14vw,5rem); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="18" fill="#2F5CC8"/>
+      <ellipse cx="12" cy="13" rx="3.5" ry="4.5" fill="white"/>
+      <ellipse cx="24" cy="13" rx="3.5" ry="4.5" fill="white"/>
+      <ellipse cx="7" cy="20" rx="2.5" ry="3.5" fill="white"/>
+      <ellipse cx="29" cy="20" rx="2.5" ry="3.5" fill="white"/>
+      <ellipse cx="18" cy="25" rx="7" ry="5" fill="white"/>
+    </svg>
+    PawFound
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#pets">Adopt</a></li>
+    <li><a href="#why">Why Adopt</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#pets" class="btn-nav">Adopt Now</a>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <svg width="28" height="28" fill="none" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round">
+      <line x1="4" y1="8" x2="24" y2="8"/>
+      <line x1="4" y1="15" x2="24" y2="15"/>
+      <line x1="4" y1="22" x2="24" y2="22"/>
+    </svg>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" id="mobileClose">✕</button>
+  <a href="#how" onclick="closeMobile()">How It Works</a>
+  <a href="#pets" onclick="closeMobile()">Adopt</a>
+  <a href="#why" onclick="closeMobile()">Why Adopt</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+  <a href="#pets" class="btn-nav" onclick="closeMobile()">Adopt Now</a>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <span class="hero-paw">🐾</span>
+  <span class="hero-paw">🐾</span>
+  <span class="hero-paw">🐾</span>
+  <span class="hero-paw">🐾</span>
+
+  <div class="hero-content fade-up visible">
+    <span class="hero-tag">🐶 Find Your Forever Friend</span>
+    <h1 class="hero-headline font-display">
+      ADOPT.<br/><span>DON'T</span><br/>SHOP.
+    </h1>
+    <p class="hero-sub">
+      Every pet in a shelter deserves a warm home, a full belly, and unconditional love. Yours is waiting right now.
+    </p>
+    <div class="hero-btns">
+      <a href="#pets" class="btn-primary">Find a Pet 🐕</a>
+      <a href="#contact" class="btn-secondary">Become a Foster</a>
+    </div>
+  </div>
+
+  <!-- Hero SVG Illustration -->
+  <div class="hero-illustration fade-up visible" style="transition-delay:0.3s">
+    <svg width="420" height="220" viewBox="0 0 420 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Person body -->
+      <ellipse cx="290" cy="195" rx="50" ry="18" fill="rgba(47,92,200,0.2)"/>
+      <!-- Person legs -->
+      <rect x="270" y="155" width="16" height="45" rx="8" fill="#2F5CC8"/>
+      <rect x="295" y="155" width="16" height="45" rx="8" fill="#2F5CC8"/>
+      <!-- Person torso -->
+      <rect x="258" y="95" width="65" height="70" rx="22" fill="#2F5CC8"/>
+      <!-- Person arm up -->
+      <rect x="220" y="90" width="46" height="16" rx="8" fill="#2F5CC8" transform="rotate(-25 220 90)"/>
+      <!-- Person arm down -->
+      <rect x="318" y="108" width="40" height="14" rx="7" fill="#2F5CC8" transform="rotate(15 318 108)"/>
+      <!-- Person head -->
+      <circle cx="290" cy="72" r="30" fill="#F4C89A"/>
+      <!-- Hair -->
+      <ellipse cx="290" cy="50" rx="30" ry="14" fill="#3A2010"/>
+      <!-- Eyes -->
+      <circle cx="280" cy="70" r="4" fill="#1A1A2E"/>
+      <circle cx="300" cy="70" r="4" fill="#1A1A2E"/>
+      <!-- Smile -->
+      <path d="M278 82 Q290 92 302 82" stroke="#1A1A2E" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+      <!-- Dog body -->
+      <ellipse cx="165" cy="170" rx="45" ry="14" fill="rgba(244,124,72,0.2)"/>
+      <ellipse cx="160" cy="155" rx="38" ry="30" fill="#F47C48"/>
+      <!-- Dog head -->
+      <circle cx="160" cy="108" r="32" fill="#F47C48"/>
+      <!-- Dog ears -->
+      <ellipse cx="135" cy="95" rx="13" ry="20" fill="#e06630" transform="rotate(-15 135 95)"/>
+      <ellipse cx="185" cy="95" rx="13" ry="20" fill="#e06630" transform="rotate(15 185 95)"/>
+      <!-- Dog eyes -->
+      <circle cx="150" cy="105" r="5" fill="#1A1A2E"/>
+      <circle cx="170" cy="105" r="5" fill="#1A1A2E"/>
+      <circle cx="152" cy="103" r="2" fill="white"/>
+      <circle cx="172" cy="103" r="2" fill="white"/>
+      <!-- Dog nose -->
+      <ellipse cx="160" cy="118" rx="7" ry="5" fill="#1A1A2E"/>
+      <!-- Dog mouth -->
+      <path d="M153 123 Q160 130 167 123" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- Dog tongue -->
+      <ellipse cx="160" cy="131" rx="5" ry="7" fill="#F88080"/>
+      <!-- Dog tail -->
+      <path d="M200 155 Q240 130 235 105" stroke="#F47C48" stroke-width="14" stroke-linecap="round" fill="none"/>
+      <!-- Dog legs -->
+      <rect x="130" y="178" width="14" height="28" rx="7" fill="#e06630"/>
+      <rect x="150" y="178" width="14" height="28" rx="7" fill="#e06630"/>
+      <rect x="170" y="178" width="14" height="28" rx="7" fill="#e06630"/>
+
+      <!-- Heart -->
+      <path d="M220 78 C220 72 212 65 205 72 C198 65 190 72 190 78 C190 90 205 100 205 100 C205 100 220 90 220 78Z" fill="#FF6B6B" opacity="0.9"/>
+
+      <!-- Stars -->
+      <text x="60" y="80" font-size="24" opacity="0.5">✦</text>
+      <text x="355" y="60" font-size="18" opacity="0.4">✦</text>
+      <text x="100" y="200" font-size="14" opacity="0.3">✦</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="how" id="how">
+  <div class="container">
+    <p class="section-tag fade-up">Simple Process</p>
+    <h2 class="section-title fade-up">How It <span>Works</span></h2>
+    <div class="steps-grid">
+      <div class="step-card fade-up">
+        <span class="step-num">01</span>
+        <div class="step-icon">🔍</div>
+        <h3>Find Your Pet</h3>
+        <p>Browse hundreds of lovable pets waiting for a home. Filter by species, age, and personality to find your perfect match.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.1s">
+        <span class="step-num">02</span>
+        <div class="step-icon">🤝</div>
+        <h3>Meet & Connect</h3>
+        <p>Schedule a meet-and-greet at your local shelter or via video. Fall in love before you even sign a thing.</p>
+      </div>
+      <div class="step-card fade-up" style="transition-delay:0.2s">
+        <span class="step-num">03</span>
+        <div class="step-icon">🏠</div>
+        <h3>Take Them Home</h3>
+        <p>Complete a simple application, receive guidance from our team, and welcome your new best friend home for life.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PETS WAITING ── -->
+<section class="pets" id="pets">
+  <div class="container">
+    <p class="section-tag fade-up">Find a Friend</p>
+    <h2 class="section-title fade-up">Pets Waiting for <span>You</span></h2>
+
+    <div class="filter-bar fade-up">
+      <button class="filter-btn active" onclick="filterPets('all', this)">All</button>
+      <button class="filter-btn" onclick="filterPets('dog', this)">🐕 Dogs</button>
+      <button class="filter-btn" onclick="filterPets('cat', this)">🐈 Cats</button>
+      <button class="filter-btn" onclick="filterPets('rabbit', this)">🐇 Rabbits</button>
+      <button class="filter-btn" onclick="filterPets('bird', this)">🦜 Birds</button>
+    </div>
+
+    <div class="pets-grid" id="petsGrid">
+      <!-- Dog 1 -->
+      <div class="pet-card fade-up" data-type="dog">
+        <div class="pet-img" style="background:#FFF0E6;">🐶</div>
+        <div class="pet-info">
+          <div class="pet-name">Biscuit</div>
+          <div class="pet-age">2 years old · Male</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Playful</span>
+            <span class="pet-tag">Loyal</span>
+            <span class="pet-tag">Good with kids</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Cat 1 -->
+      <div class="pet-card fade-up" data-type="cat" style="transition-delay:0.05s">
+        <div class="pet-img" style="background:#EEF2FF;">🐱</div>
+        <div class="pet-info">
+          <div class="pet-name">Luna</div>
+          <div class="pet-age">3 years old · Female</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Calm</span>
+            <span class="pet-tag">Curious</span>
+            <span class="pet-tag">Indoor</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Rabbit 1 -->
+      <div class="pet-card fade-up" data-type="rabbit" style="transition-delay:0.1s">
+        <div class="pet-img" style="background:#F0FFF4;">🐇</div>
+        <div class="pet-info">
+          <div class="pet-name">Cottontail</div>
+          <div class="pet-age">1 year old · Female</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Gentle</span>
+            <span class="pet-tag">Quiet</span>
+            <span class="pet-tag">Apartment-friendly</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Bird 1 -->
+      <div class="pet-card fade-up" data-type="bird" style="transition-delay:0.15s">
+        <div class="pet-img" style="background:#FFFBEB;">🦜</div>
+        <div class="pet-info">
+          <div class="pet-name">Mango</div>
+          <div class="pet-age">4 years old · Male</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Talkative</span>
+            <span class="pet-tag">Smart</span>
+            <span class="pet-tag">Colorful</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Dog 2 -->
+      <div class="pet-card fade-up" data-type="dog" style="transition-delay:0.2s">
+        <div class="pet-img" style="background:#FFF0E6;">🐕</div>
+        <div class="pet-info">
+          <div class="pet-name">Rocky</div>
+          <div class="pet-age">5 years old · Male</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Energetic</span>
+            <span class="pet-tag">Protective</span>
+            <span class="pet-tag">Trained</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Cat 2 -->
+      <div class="pet-card fade-up" data-type="cat" style="transition-delay:0.25s">
+        <div class="pet-img" style="background:#EEF2FF;">🐈‍⬛</div>
+        <div class="pet-info">
+          <div class="pet-name">Shadow</div>
+          <div class="pet-age">2 years old · Male</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Independent</span>
+            <span class="pet-tag">Sleek</span>
+            <span class="pet-tag">Quiet</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Dog 3 -->
+      <div class="pet-card fade-up" data-type="dog" style="transition-delay:0.3s">
+        <div class="pet-img" style="background:#FFF0E6;">🦮</div>
+        <div class="pet-info">
+          <div class="pet-name">Daisy</div>
+          <div class="pet-age">3 years old · Female</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Gentle</span>
+            <span class="pet-tag">Family-friendly</span>
+            <span class="pet-tag">Obedient</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+      <!-- Rabbit 2 -->
+      <div class="pet-card fade-up" data-type="rabbit" style="transition-delay:0.35s">
+        <div class="pet-img" style="background:#F0FFF4;">🐰</div>
+        <div class="pet-info">
+          <div class="pet-name">Oreo</div>
+          <div class="pet-age">1.5 years old · Male</div>
+          <div class="pet-tags">
+            <span class="pet-tag">Playful</span>
+            <span class="pet-tag">Social</span>
+            <span class="pet-tag">Fluffy</span>
+          </div>
+          <button class="btn-adopt">Adopt Me 🐾</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY ADOPT ── -->
+<section class="why" id="why">
+  <div class="why-bg-text">LOVE</div>
+  <div class="container" style="position:relative;z-index:2;">
+    <p class="section-tag fade-up">The Numbers</p>
+    <h2 class="section-title fade-up">Why Adopt <span>Matters</span></h2>
+    <p style="color:rgba(255,255,255,0.75);max-width:520px;margin-top:1rem;line-height:1.6;" class="fade-up">
+      Every year, millions of animals enter shelters with nowhere to go. Adoption changes everything — for them, and for you.
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card fade-up">
+        <div class="stat-num">50K+</div>
+        <div class="stat-label">Pets rescued and rehomed through our platform</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:0.1s">
+        <div class="stat-num">32K</div>
+        <div class="stat-label">Happy families created in the last 5 years</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:0.2s">
+        <div class="stat-num">200+</div>
+        <div class="stat-label">Partner shelters supported nationwide</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section class="services" id="services">
+  <div class="container">
+    <p class="section-tag fade-up">What We Offer</p>
+    <h2 class="section-title fade-up">How We <span>Support</span> You</h2>
+    <div class="services-grid">
+      <div class="service-card fade-up">
+        <div class="service-icon">🏠</div>
+        <h3>Adoption</h3>
+        <p>Find, meet, and bring home your ideal companion with full shelter support.</p>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.05s">
+        <div class="service-icon">💛</div>
+        <h3>Foster</h3>
+        <p>Temporarily care for a pet in need while they wait for their forever home.</p>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.1s">
+        <div class="service-icon">🎁</div>
+        <h3>Donate</h3>
+        <p>Support shelters directly. Every dollar feeds, heals, and protects animals.</p>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.15s">
+        <div class="service-icon">🩺</div>
+        <h3>Vet Help</h3>
+        <p>Access discounted veterinary care and health resources for your new pet.</p>
+      </div>
+      <div class="service-card fade-up" style="transition-delay:0.2s">
+        <div class="service-icon">🚨</div>
+        <h3>Rescue Support</h3>
+        <p>Report stray or at-risk animals and connect them with rescue teams fast.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <p class="section-tag fade-up">Success Stories</p>
+    <h2 class="section-title fade-up">They Found <span style="color:var(--orange)">Their Person</span></h2>
+    <div class="testi-grid">
+      <div class="testi-card fade-up">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">Adopting Biscuit was the best decision of my life. PawFound made the whole process so easy and warm — it felt like they genuinely cared about us both.</p>
+        <div class="testi-author">
+          <span class="testi-avatar">👩</span>
+          <div>
+            <div class="testi-name">Sarah M.</div>
+            <div class="testi-pet">Adopted Biscuit 🐶 · Austin, TX</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up" style="transition-delay:0.1s">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">Luna came into our home and completely changed the vibe. She's calm, smart, and perfect for apartment life. Thank you PawFound for matching us!</p>
+        <div class="testi-author">
+          <span class="testi-avatar">👨</span>
+          <div>
+            <div class="testi-name">James & Priya T.</div>
+            <div class="testi-pet">Adopted Luna 🐱 · New York, NY</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up" style="transition-delay:0.2s">
+        <div class="testi-quote">"</div>
+        <p class="testi-text">We fostered Cottontail for two weeks and couldn't let her go! The team guided us every step of the way. Best impulse decision we ever made as a family.</p>
+        <div class="testi-author">
+          <span class="testi-avatar">👨‍👩‍👧</span>
+          <div>
+            <div class="testi-name">The Garcia Family</div>
+            <div class="testi-pet">Adopted Cottontail 🐇 · Miami, FL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-left fade-up">
+        <span class="big-emoji">🐾</span>
+        <h3>Let's Connect</h3>
+        <p>Have questions? Want to foster? Partner with us?<br/>We'd love to hear from you.</p>
+
+        <div style="margin-top:2rem;display:flex;flex-direction:column;gap:0.8rem;align-items:flex-start;">
+          <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color:#555;">
+            📧 hello@pawfound.org
+          </span>
+          <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color:#555;">
+            📞 +1 (800) PAW-FOUND
+          </span>
+          <span style="display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;color:#555;">
+            📍 123 Shelter Lane, Austin TX 78701
+          </span>
+        </div>
+      </div>
+      <div class="contact-form fade-up" style="transition-delay:0.15s">
+        <div class="form-row">
+          <input class="form-input" type="text" placeholder="Your Name"/>
+          <input class="form-input" type="email" placeholder="Email Address"/>
+        </div>
+        <input class="form-input" type="text" placeholder="Subject"/>
+        <textarea class="form-input form-textarea" placeholder="Your message..."></textarea>
+        <button class="btn-submit" onclick="handleSubmit(event)">Send Message 🐾</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h2>🐾 PawFound</h2>
+        <p>Building bridges between animals in need and families with room in their hearts.</p>
+        <p class="footer-tagline">Every pet deserves a home.</p>
+        <div class="social-links" style="margin-top:1.2rem;">
+          <a href="#" class="social-btn">🐦</a>
+          <a href="#" class="social-btn">📸</a>
+          <a href="#" class="social-btn">👤</a>
+          <a href="#" class="social-btn">📌</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#pets">Adopt a Pet</a></li>
+          <li><a href="#why">Why Adopt</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Foster a Pet</a></li>
+          <li><a href="#">Donate</a></li>
+          <li><a href="#">Vet Resources</a></li>
+          <li><a href="#">Rescue Report</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Partner Shelters</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 PawFound. All rights reserved.</span>
+      <span class="footer-motto">Every pet deserves a home. 🐾</span>
+      <span>Privacy · Terms · Cookies</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Navbar scroll ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('solid', window.scrollY > 60);
+  });
+
+  // ── Mobile menu ──
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+  document.getElementById('mobileClose').addEventListener('click', closeMobile);
+  function closeMobile() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── Scroll fade-up ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => {
+    if (!el.classList.contains('visible')) observer.observe(el);
+  });
+
+  // ── Pet filter ──
+  function filterPets(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.pet-card').forEach(card => {
+      const show = type === 'all' || card.dataset.type === type;
+      card.classList.toggle('hidden', !show);
+    });
+  }
+
+  // ── Contact submit ──
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target;
+    btn.textContent = '✓ Message Sent!';
+    btn.style.background = '#2F5CC8';
+    setTimeout(() => {
+      btn.textContent = 'Send Message 🐾';
+      btn.style.background = '';
+    }, 3000);
+  }
+
+  // ── Smooth scroll for anchors ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
